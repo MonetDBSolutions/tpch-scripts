@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 usage () {
-    echo "usage: -farm <farm> -db <db>"
+    echo "usage: --farm <farm> --db <db>"
 }
 
 farm=
@@ -29,6 +29,12 @@ do
             ;;
     esac
 done
+
+if [ -z "$farm" -o -z "$db" ]
+then
+    usage
+    exit 1
+fi
 
 for threads in $(seq 1 96)
 do
