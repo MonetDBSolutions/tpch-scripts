@@ -1,3 +1,5 @@
 *.o
 dbgen
 qgen
+*/SF-*/*
+*.load
