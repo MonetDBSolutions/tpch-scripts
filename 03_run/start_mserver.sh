@@ -7,6 +7,7 @@ db=
 start_stethoscope=false
 dry_run=
 
+echo "$0 $@"
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -f|--farm)
@@ -33,12 +34,17 @@ while [ "$#" -gt 0 ]; do
             start_stethoscope=true
             shift
             ;;
+        -e|--set)
+            arg="--set $2"
+            shift
+            shift
+            ;;
         -y|--dry)
             dry_run=echo
             shift
             ;;
         *)
-            echo "$0: unknown option $1"
+            echo "$0: unknown option >$1<"
             exit 1
             ;;
     esac
@@ -54,7 +60,7 @@ if [ -e "$farm/$db/.vaultkey" ]; then
     vault_arg="--set monet_vault_key=$farm/$db/.vaultkey"
 fi
 
-cmdstr="mserver5 --dbpath=$farm/$db $vault_arg --daemon=yes $threads $mmap_threshold"
+cmdstr="mserver5 --dbpath=$farm/$db $vault_arg --daemon=yes $arg"
 if [ -z "$dry_run" ]; then
     ($cmdstr& echo $! > /tmp/mserver.pid)
     until mclient -d "$db" -s 'select 1' >& /dev/null; do sleep 1; done
