@@ -7,7 +7,6 @@ db=
 start_stethoscope=false
 dry_run=
 
-echo "$0 $@"
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -f|--farm)
@@ -39,6 +38,11 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
+        -l|--logdir)
+            logdir="$2"
+            shift
+            shift
+            ;;
         -y|--dry)
             dry_run=echo
             shift
@@ -67,11 +71,17 @@ if [ -z "$dry_run" ]; then
 else
     echo "$cmdstr"
 fi
+if [ -z "$logdir" ]; then
+    logdir=/tmp
+    if [ ! -d "$logdir" ]; then
+        mkdir "$logdir"
+    fi
+fi
 log_fn=$(echo "$cmdstr" | tr -s ' ' '_' | tr '/' '_')
 log_fn="$log_fn"_$(date +%s)
-cmdstr="stethoscope -d $db -j -o /tmp/$log_fn"
+cmdstr="stethoscope -d $db -j -o $logdir/$log_fn"
 if [ -z "$dry_run" ]; then
-    touch "/tmp/$log_fn"
+    touch "$logdir/$log_fn"
     ($cmdstr& echo $! > /tmp/stethoscope.pid)
 else
     echo "$cmdstr"

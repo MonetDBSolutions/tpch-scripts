@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 usage () {
-    echo "usage: --farm <farm> --db <db> [--arg <mserver arg> --range <min>:<max> --function <python 3 expression>] [--stethoscope]"
+    echo "usage: $0 --farm <farm> --db <db> [--arg <mserver arg> --range <min>:<max> --function <python 3 expression>] [--stethoscope] [--logdir <directory>]"
 }
 
 farm=
@@ -35,6 +35,11 @@ do
             ;;
         -a|--arg)
             ar="$2"
+            shift
+            shift
+            ;;
+        -l|--logdir)
+            logdir="-l $2"
             shift
             shift
             ;;
@@ -73,9 +78,7 @@ do
     else
         argument="$ar=$arg_val"
     fi
-    echo ">$argument<"
-    echo "./start_mserver.sh" "-f" "$farm" "-d" "$db" "--set" "$argument" "$stethoscope"
-    ./start_mserver.sh "-f" "$farm" "-d" "$db" "--set" "$argument" "$stethoscope"
+    ./start_mserver.sh "-f" "$farm" "-d" "$db" "--set" "$argument" $stethoscope $logdir
 #    ./horizontal_run.sh "$db" 5 "$threads" # | tee -a results/result.csv
     sleep 3
     kill $(cat /tmp/stethoscope.pid)
