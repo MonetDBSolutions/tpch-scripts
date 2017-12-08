@@ -79,7 +79,7 @@ do
         argument="$ar=$arg_val"
     fi
     ./start_mserver.sh "-f" "$farm" "-d" "$db" "--set" "$argument" $stethoscope $logdir
-#    ./horizontal_run.sh "$db" 5 "$threads" # | tee -a results/result.csv
+    ./horizontal_run.sh "$db" 5 "$argument"
     sleep 3
     kill $(cat /tmp/stethoscope.pid)
     kill $(cat /tmp/mserver.pid)
