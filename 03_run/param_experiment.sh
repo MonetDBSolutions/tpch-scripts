@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 usage () {
-    echo "Usage: $0 --farm <farm> --db <db> [--arg <mserver arg> --range <min>:<max>[:<step>] --function <python 3 expression>] [--stethoscope] [--logdir <directory>] [--onlystart]"
+    echo "Usage: $0 --farm <farm> --db <db> [--number <repeats>] [--arg <mserver arg> --range <min>:<max>[:<step>] --function <python 3 expression>] [--stethoscope] [--logdir <directory>] [--onlystart]"
     echo "Start mserver with different arguments and run TPC-H"
     echo ""
     echo "  -f, --farm <farm>                 The path to the db farm"
     echo "  -d, --db <db>                     The database"
+    echo "  -n, --number <repeats>            How many times to run the queries. Default=5"
     echo "  -a, --arg <mserver arg>           The mserver argument"
     echo "  -r, --range <min>:<max>:[step]    The range of the values for 'arg'"
     echo "  -f, --funtion <exp>               A transformation for the current value."
@@ -22,6 +23,7 @@ usage () {
 farm=
 db=
 onlystart=false
+nruns=5
 while [ "$#" -gt 0 ]
 do
     case "$1" in
@@ -37,6 +39,11 @@ do
             ;;
         -s|--stethoscope)
             stethoscope="-s"
+            shift
+            ;;
+        -n|--number)
+            nruns=$2
+            shift
             shift
             ;;
         -r|--range)
@@ -109,7 +116,7 @@ do
     fi
     ./start_mserver.sh "-f" "$farm" "-d" "$db" "--set" "$argument" $stethoscope $logdir
     if ! $onlystart; then
-        ./horizontal_run.sh "$db" 5 "$argument"
+        ./horizontal_run.sh -d "$db" -n "$nruns" -t "$argument"
     fi
     sleep 3
     kill $(cat /tmp/stethoscope.pid)
