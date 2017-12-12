@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
 usage () {
     echo "Usage: $0 --farm <farm> --db <db> [--number <repeats>] [--arg <mserver arg> --range <min>:<max>[:<step>] --function <python 3 expression>] [--stethoscope] [--logdir <directory>] [--onlystart]"
     echo "Start mserver with different arguments and run TPC-H"

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
 usage () {
     echo "Usage: $0 --farm <path> --db <db> [--set arg=value] [--stethoscope] [--logdir <path>] [-dry] [--verbose] [--help]"
     echo "Start the mserver with specific argumnents. Mainly useful for scripting."
