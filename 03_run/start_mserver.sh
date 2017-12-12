@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+usage () {
+    echo "Usage: $0 --farm <path> --db <db> [--set arg=value] [--stethoscope] [--logdir <path>] [-dry] [--verbose] [--help]"
+    echo "Start the mserver with specific argumnents. Mainly useful for scripting."
+    echo ""
+    echo "  -f, --farm <farm>                 The path to the db farm"
+    echo "  -d, --db <db>                     The database"
+    echo "  -e, --set <arg=value>             Start the mserver with the argument <arg>"
+    echo "                                    having value <val>"
+    echo "  -s, --stethoscope                 Save the stethoscope output"
+    echo "  -l, --logdir <path>               The directory to save stethoscope logs"
+    echo "  -y, --dry                         Don't start the server, just print the command"
+    echo "  -v, --verbose                     More output"
+    echo "  -h, --help                        This message"
+}
+
 threads=
 mmap_threshold=
 farm=
@@ -16,16 +31,6 @@ while [ "$#" -gt 0 ]; do
             ;;
         -d|--db)
             db="$2"
-            shift
-            shift
-            ;;
-        -n|--nthreads)
-            threads="--set gdk_nr_threads=$2"
-            shift
-            shift
-            ;;
-        -m|--mmap_threshold)
-            mmap_threshold="--set gdk_mmap_minsize_transient=$(echo $2 | bc)"
             shift
             shift
             ;;
@@ -47,16 +52,26 @@ while [ "$#" -gt 0 ]; do
             dry_run=echo
             shift
             ;;
+        -v|--verbose)
+            set -x
+            set -v
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
         *)
             echo "$0: unknown option >$1<"
+            usage
             exit 1
             ;;
     esac
 done
 
 if [ -z "$farm" -o -z "$db" ]; then
-    echo "$0: --farm <dbfarm_path> --db <db_name> [--nthreads <number of threads>] [--mmap_threshold <size in bytes>] [--stethoscope]"
-    exit 1
+    usage
+    exit 2
 fi
 
 vault_arg=

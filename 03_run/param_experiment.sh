@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
 
 usage () {
-    echo "usage: $0 --farm <farm> --db <db> [--arg <mserver arg> --range <min>:<max> --function <python 3 expression>] [--stethoscope] [--logdir <directory>]"
+    echo "Usage: $0 --farm <farm> --db <db> [--arg <mserver arg> --range <min>:<max>[:<step>] --function <python 3 expression>] [--stethoscope] [--logdir <directory>] [--onlystart]"
+    echo "Start mserver with different arguments and run TPC-H"
+    echo ""
+    echo "  -f, --farm <farm>                 The path to the db farm"
+    echo "  -d, --db <db>                     The database"
+    echo "  -a, --arg <mserver arg>           The mserver argument"
+    echo "  -r, --range <min>:<max>:[step]    The range of the values for 'arg'"
+    echo "  -f, --funtion <exp>               A transformation for the current value."
+    echo "                                    It must be a valid python 3 expression,"
+    echo "                                    The text '\\\$r' will be subsituted for"
+    echo "                                    the current value."
+    echo "  -s, --stethoscope                 Save the stethoscope output"
+    echo "  -l, --logdir <path>               The directory to save stethoscope logs"
+    echo "  -o, --onlystart                   Only start the server, don't run TPC-H"
+    echo "  -v, --verbose                     More output"
+    echo "  -h, --help                        This message"
 }
 
 farm=
 db=
+onlystart=false
 while [ "$#" -gt 0 ]
 do
     case "$1" in
@@ -43,8 +59,18 @@ do
             shift
             shift
             ;;
+        -v|--verbose)
+            set -x
+            set -v
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
         *)
             echo "$0: unknown argument $1"
+            usage
             exit 1
             ;;
     esac
