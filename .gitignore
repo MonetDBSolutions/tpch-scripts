@@ -1,6 +1,7 @@
 *.o
 dbgen
 qgen
-*/SF-*/*
+SF-*/
+sf*/
 *.load
-*/results/*
+results/
