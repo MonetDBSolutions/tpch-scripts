@@ -64,10 +64,10 @@ if [ ! -e "$farm_path" ]; then
 fi
 
 # Start the daemon
-monetdb set port="$port"
+monetdb set port="$port" "$farm_path"
 monetdbd start "$farm_path"
 # Load the data
-./sf_build.sh SF-"$scale_factor"
+./sf_build.sh SF-"$scale_factor" "$port"
 # Stop the daemon
 monetdbd stop "$farm_path"
 
