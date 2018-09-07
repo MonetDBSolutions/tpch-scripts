@@ -7,9 +7,10 @@ farm_path=
 scale_factor=
 
 usage() {
-    echo "Usage: $0 --sf <scale factor> --farm <farm path>"
+    echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>]"
 }
 
+port=50000
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -s|--sf)
@@ -22,6 +23,11 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
+	-p|--port)
+	    port=$2
+	    shift
+	    shift
+	    ;;
         *)
             echo "$0: Unknown parameter $1"
             usage
@@ -58,6 +64,7 @@ if [ ! -e "$farm_path" ]; then
 fi
 
 # Start the daemon
+monetdb set port="$port"
 monetdbd start "$farm_path"
 # Load the data
 ./sf_build.sh SF-"$scale_factor"
