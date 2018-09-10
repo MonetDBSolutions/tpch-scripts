@@ -14,6 +14,7 @@ usage () {
     echo "  -e, --set <arg=value>             Start the mserver with the argument <arg>"
     echo "                                    having value <val>"
     echo "  -s, --stethoscope                 Save the stethoscope output"
+    echo "  -m, --massif                      Use massif to profile memory allocations"
     echo "  -l, --logdir <path>               The directory to save stethoscope logs"
     echo "  -y, --dry                         Don't start the server, just print the command"
     echo "  -v, --verbose                     More output"
@@ -54,6 +55,10 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
+	-m|--massif)
+	    prefix_cmd="valgrind --tool=massif --pages-as-heap=yes"
+	    shift
+	    ;;
         -y|--dry)
             dry_run=echo
             shift
@@ -85,7 +90,11 @@ if [ -e "$farm/$db/.vaultkey" ]; then
     vault_arg="--set monet_vault_key=$farm/$db/.vaultkey"
 fi
 
-cmdstr="mserver5 --dbpath=$farm/$db $vault_arg --daemon=yes $arg"
+if [ -z "$prefix_cmd" ]; then
+    cmdstr="mserver5 --dbpath=$farm/$db $vault_arg --daemon=yes $arg"
+else
+    cmdstr="$prefix_cmd mserver5 --dbpath=$farm/$db $vault_arg --daemon=yes $arg"
+fi
 if [ -z "$dry_run" ]; then
     ($cmdstr& echo $! > /tmp/mserver.pid)
     until mclient -d "$db" -s 'select 1' >& /dev/null; do sleep 1; done

@@ -105,3 +105,5 @@ do
 
     echo "$dbname,$tag,"$(basename $i .sql)",$mn,$mx,$avg" | tee -a "$output"
 done
+
+

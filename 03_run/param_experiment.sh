@@ -19,6 +19,7 @@ usage () {
     echo "                                    The text '\\\$r' will be subsituted for"
     echo "                                    the current value."
     echo "  -s, --stethoscope                 Save the stethoscope output"
+    echo "  -m, --massif                      Use massif to profile memory allocations"
     echo "  -l, --logdir <path>               The directory to save stethoscope logs"
     echo "  -o, --onlystart                   Only start the server, don't run TPC-H"
     echo "  -v, --verbose                     More output"
@@ -29,6 +30,7 @@ farm=
 db=
 onlystart=false
 nruns=5
+massif=
 while [ "$#" -gt 0 ]
 do
     case "$1" in
@@ -80,6 +82,11 @@ do
             onlystart=true
             shift
             ;;
+	-m|--massif)
+            massif="-m"
+	    shift
+	    shift
+	    ;;
         -h|--help)
             usage
             exit 0
@@ -98,9 +105,14 @@ then
     exit 1
 fi
 
-min=$(echo "$range" | awk -F: '{print $1}')
-max=$(echo "$range" | awk -F: '{print $2}')
-step=$(echo "$range" | awk -F: '{print $3}')
+if [ -z "$range" ]; then
+    min=1
+    max=1
+else
+    min=$(echo "$range" | awk -F: '{print $1}')
+    max=$(echo "$range" | awk -F: '{print $2}')
+    step=$(echo "$range" | awk -F: '{print $3}')
+fi
 
 if [ -z "$min" -o -z "$max" ];
 then
@@ -117,9 +129,9 @@ do
     then
         argument=
     else
-        argument="$ar=$arg_val"
+        argument="--set $ar=$arg_val"
     fi
-    ./start_mserver.sh "-f" "$farm" "-d" "$db" "--set" "$argument" $stethoscope $logdir
+    ./start_mserver.sh "-f" "$farm" "-d" "$db" $argument $stethoscope $logdir $massif
     if ! $onlystart; then
         ./horizontal_run.sh -d "$db" -n "$nruns" -t "$argument"
     fi
