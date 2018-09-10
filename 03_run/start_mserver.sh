@@ -24,8 +24,9 @@ threads=
 mmap_threshold=
 farm=
 db=
-start_stethoscope=false
+start_stethoscope=0
 dry_run=
+prefix_cmd=
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
@@ -40,7 +41,7 @@ while [ "$#" -gt 0 ]; do
             shift
             ;;
         -s|--stethoscope)
-            start_stethoscope=true
+            start_stethoscope=1
             shift
             ;;
         -e|--set)
@@ -99,10 +100,12 @@ if [ -z "$logdir" ]; then
 fi
 log_fn=$(echo "$cmdstr" | tr -s ' ' '_' | tr '/' '_')
 log_fn="$log_fn"_$(date +%s)
-cmdstr="stethoscope -d $db -j -o $logdir/$log_fn"
-if [ -z "$dry_run" ]; then
-    touch "$logdir/$log_fn"
-    ($cmdstr& echo $! > /tmp/stethoscope.pid)
-else
-    echo "$cmdstr"
+if [ "$start_stethoscope" = "1" ]; then
+    cmdstr="stethoscope -d $db -j -o $logdir/$log_fn"
+    if [ -z "$dry_run" ]; then
+        touch "$logdir/$log_fn"
+        ($cmdstr& echo $! > /tmp/stethoscope.pid)
+    else
+        echo "$cmdstr"
+    fi
 fi
