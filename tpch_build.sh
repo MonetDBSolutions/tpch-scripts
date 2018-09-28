@@ -42,7 +42,7 @@ if [ -z "$scale_factor" -o -z "$farm_path" ]; then
 fi
 
 # Add dot monetdb file for permissions
-cat << EOF > $HOME/.monetdb
+test -f $HOME/.monetdb || cat << EOF > $HOME/.monetdb
 user=monetdb
 password=monetdb
 save_history=true
