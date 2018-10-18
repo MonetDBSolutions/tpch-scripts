@@ -1,3 +1,11 @@
+-- !/usr/bin/env bash
+
+--  This Source Code Form is subject to the terms of the Mozilla Public
+--  License, v. 2.0.  If a copy of the MPL was not distributed with this
+--  file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+--  Copyright 2017-2018 MonetDB Solutions B.V.
+
 -- Sccsid:     @(#)dss.ddl	2.1.8.1
 CREATE TABLE NATION  ( N_NATIONKEY  INTEGER NOT NULL,
                             N_NAME       CHAR(25) NOT NULL,

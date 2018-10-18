@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0.  If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright 2017-2018 MonetDB Solutions B.V.
+
 # The path to the database farm
 farm_path=
 
@@ -43,6 +49,7 @@ if [ -z "$scale_factor" -o -z "$farm_path" ]; then
     exit 1
 fi
 
+# Make sure the farm path given is absolute
 if [ "$farm_path" = "${farm_path#/}" ]; then
     usage
     exit 1
