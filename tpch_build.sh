@@ -3,11 +3,13 @@
 # The path to the database farm
 farm_path=
 
-# The TPC-H scale factor 
+# The TPC-H scale factor
 scale_factor=
 
 usage() {
     echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>]"
+    echo "scale factor 1 is 1GB database"
+    echo "farm path should be an absolute path"
 }
 
 port=50000
@@ -23,11 +25,11 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
-	-p|--port)
-	    port=$2
-	    shift
-	    shift
-	    ;;
+        -p|--port)
+            port=$2
+            shift
+            shift
+            ;;
         *)
             echo "$0: Unknown parameter $1"
             usage
@@ -37,6 +39,11 @@ while [ "$#" -gt 0 ]; do
 done
 
 if [ -z "$scale_factor" -o -z "$farm_path" ]; then
+    usage
+    exit 1
+fi
+
+if [ "$farm_path" = "${farm_path#/}" ]; then
     usage
     exit 1
 fi
