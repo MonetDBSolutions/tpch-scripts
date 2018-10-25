@@ -72,7 +72,7 @@ mv *.tbl ../../02_load/SF-"$scale_factor"/data
 popd
 pushd 02_load
 
-# Create the database
+# Create the database farm
 if [ ! -e "$farm_path" ]; then
     monetdbd create "$farm_path"
 fi
