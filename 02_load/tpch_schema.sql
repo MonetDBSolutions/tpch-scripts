@@ -49,17 +49,17 @@ CREATE TABLE CUSTOMER ( C_CUSTKEY     INTEGER NOT NULL,
                              C_MKTSEGMENT  CHAR(10) NOT NULL,
                              C_COMMENT     VARCHAR(117) NOT NULL);
 
-CREATE TABLE ORDERS  ( O_ORDERKEY       INTEGER NOT NULL,
+CREATE TABLE ORDERS  ( O_ORDERKEY       BIGINT NOT NULL,
                            O_CUSTKEY        INTEGER NOT NULL,
                            O_ORDERSTATUS    CHAR(1) NOT NULL,
                            O_TOTALPRICE     DECIMAL(15,2) NOT NULL,
                            O_ORDERDATE      DATE NOT NULL,
-                           O_ORDERPRIORITY  CHAR(15) NOT NULL,  
-                           O_CLERK          CHAR(15) NOT NULL, 
+                           O_ORDERPRIORITY  CHAR(15) NOT NULL,
+                           O_CLERK          CHAR(15) NOT NULL,
                            O_SHIPPRIORITY   INTEGER NOT NULL,
                            O_COMMENT        VARCHAR(79) NOT NULL);
 
-CREATE TABLE LINEITEM ( L_ORDERKEY    INTEGER NOT NULL,
+CREATE TABLE LINEITEM ( L_ORDERKEY    BIGINT NOT NULL,
                              L_PARTKEY     INTEGER NOT NULL,
                              L_SUPPKEY     INTEGER NOT NULL,
                              L_LINENUMBER  INTEGER NOT NULL,
@@ -75,4 +75,3 @@ CREATE TABLE LINEITEM ( L_ORDERKEY    INTEGER NOT NULL,
                              L_SHIPINSTRUCT CHAR(25) NOT NULL,
                              L_SHIPMODE     CHAR(10) NOT NULL,
                              L_COMMENT      VARCHAR(44) NOT NULL);
-
