@@ -55,6 +55,14 @@ if [ "$farm_path" = "${farm_path#/}" ]; then
     exit 1
 fi
 
+# Find the root directory of the TPC-H scripts
+root_directory=$(readlink -f $0)
+root_directory=${root_directory%${0:1}}
+echo "Root directory = $root_directory"
+
+# Go to the scripts root directory
+pushd $root_directory
+
 # Add dot monetdb file for permissions
 test -f $HOME/.monetdb || cat << EOF > $HOME/.monetdb
 user=monetdb
@@ -62,14 +70,19 @@ password=monetdb
 save_history=true
 EOF
 
-pushd 01_build/dbgen
-make
-# Create the data for the scale factor
-./dbgen -vf -s "$scale_factor"
+# Generate the data if the following directory does not exist.
+# TODO: Add a condition about the actual files we need.
+if [ ! -e "$root_directory/02_load/SF-$scale_factor/data" ]; then
+    pushd 01_build/dbgen
+    make
+    # Create the data for the scale factor
+    ./dbgen -vf -s "$scale_factor"
 
-mkdir -p ../../02_load/SF-"$scale_factor"/data
-mv *.tbl ../../02_load/SF-"$scale_factor"/data
-popd
+    mkdir -p "$root_directory/02_load/SF-$scale_factor/data"
+    mv *.tbl "$root_directory/02_load/SF-$scale_factor/data"
+    popd
+fi
+
 pushd 02_load
 
 # Create the database farm
@@ -88,3 +101,6 @@ monetdbd stop "$farm_path"
 echo "SF-$scale_factor loaded. Use"
 echo "mserver5 --dbpath=$farm_path/SF-$scale_factor --set monet_vault_key=$farm_path/SF-$scale_factor/.vaultkey"
 echo "to start the server."
+
+# Go back to the original directory
+popd
