@@ -19,12 +19,27 @@ monetdb -p "$port" release "$1"
 date
 time mclient -d "$1" -ei tpch_schema.sql
 date
-if [ ! -e $1.load ]; then
-  wc -l $PWD/$1/data/* | grep -v total | sort -n | awk -f copy_into.awk > $1.load
+
+# Generate the counts file if it does not exist or if its size is zero
+if [ ! -s $1.counts ]; then
+  wc -l $PWD/$1/data/* | grep -v total | sort -n > $1.counts
 fi
+
+# Generate the copy into file
+awk -f copy_into.awk $1.counts > $1.load
+
+# Generate the verification file
+awk -f verify.awk $1.counts > $1.verify
+
+echo "Loading data"
 time mclient -d "$1" -p "$port" -ei $1.load
 date
+
+echo "Adding constraints"
 time mclient -d "$1" -p "$port" -ei tpch_alter.sql
 date
-#cd;cd tpch; atlas $1
-#cd;cd tpch; runqueries $1
+
+echo "Verifying: all the numbers should be zero"
+mclient -d "$1" -p "$port" -f csv $1.verify | tee /tmp/verify_load
+
+cmp ground_truth /tmp/verify_load

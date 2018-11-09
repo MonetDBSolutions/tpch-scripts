@@ -3,12 +3,13 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #
 # Copyright 2017-2018 MonetDB Solutions B.V.
-*.o
-dbgen
-qgen
-SF-*/
-sf*/
-*.load
-results/
-*.counts
-*.verify
+
+BEGIN {
+  regex="[^/]+.tbl"
+}
+{
+  if (match($2, regex)) {
+    table=substr($2, RSTART, RLENGTH-4);
+    print "SELECT count(*) - " $1 " FROM " table ";"
+  }
+}

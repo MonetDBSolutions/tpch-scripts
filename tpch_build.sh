@@ -91,10 +91,14 @@ if [ ! -e "$farm_path" ]; then
 fi
 
 # Start the daemon
-monetdb set port="$port" "$farm_path"
+monetdbd set port="$port" "$farm_path"
 monetdbd start "$farm_path"
 # Load the data
 ./sf_build.sh SF-"$scale_factor" "$port"
+if [ $? != 0 ]; then
+    echo "Data not loaded correctly"
+    exit 1
+fi
 # Stop the daemon
 monetdbd stop "$farm_path"
 
