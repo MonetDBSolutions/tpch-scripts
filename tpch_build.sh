@@ -18,6 +18,9 @@ port=50000
 # Should we actually run?
 dry_run=
 
+# show commands as they are executed
+verbose=
+
 usage() {
     echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>] [--dry-run]"
     echo "Generate and load TPC-H data to MonetDB"
@@ -62,6 +65,10 @@ while [ "$#" -gt 0 ]; do
 	    dry_run="true"
 	    shift
 	    ;;
+	-v|--verbose)
+	    verbose="true"
+	    shift
+	    ;;
 	-h|--help)
 	    usage
 	    exit 0
@@ -88,6 +95,10 @@ fi
 if [ ! -z "$dry_run" ]; then
     server_startup_command
     exit 0
+fi
+
+if [ ! -z "$verbose" ]; then
+    set -x
 fi
 
 # Find the root directory of the TPC-H scripts
