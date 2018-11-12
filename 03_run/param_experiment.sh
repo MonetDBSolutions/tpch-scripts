@@ -16,9 +16,9 @@ usage () {
     echo "  -n, --number <repeats>            How many times to run the queries. Default=5"
     echo "  -a, --arg <mserver arg>           The mserver argument"
     echo "  -r, --range <min>:<max>:[step]    The range of the values for 'arg'"
-    echo "  -f, --funtion <exp>               A transformation for the current value."
+    echo "  -u, --function <exp>              A transformation for the current value."
     echo "                                    It must be a valid python 3 expression,"
-    echo "                                    The text '\\\$r' will be subsituted for"
+    echo "                                    The text '\$r' will be subsituted for"
     echo "                                    the current value."
     echo "  -s, --stethoscope                 Save the stethoscope output"
     echo "  -m, --massif                      Use massif to profile memory allocations"
@@ -60,7 +60,7 @@ do
             shift
             shift
             ;;
-        -f|--function)
+        -u|--function)
             fn="$2"
             shift
             shift
