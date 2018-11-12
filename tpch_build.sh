@@ -14,8 +14,15 @@ scale_factor=
 
 usage() {
     echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>]"
-    echo "scale factor 1 is 1GB database"
-    echo "farm path should be an absolute path"
+    echo "Generate and load TPC-H data to MonetDB"
+    echo ""
+    echo "Options:"
+    echo "  -s, --sf <scale factor>                The scale factor for TPC-H data."
+    echo "                                         Scale factor 1 is 1GB of data."
+    echo "  -f, --farm <farm path>                 The absolute path to the MonetDB"
+    echo "                                         data farm."
+    echo "  -p, --port <port>                      The MonetDB daemon listen port"
+    echo "                                         (default 50000)."
 }
 
 port=50000
@@ -36,6 +43,10 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
+	-h|--help)
+	    usage
+	    exit 0
+	    ;;
         *)
             echo "$0: Unknown parameter $1"
             usage

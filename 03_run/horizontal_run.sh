@@ -10,6 +10,7 @@ usage() {
     echo "Usage: $0 --db <db> [--number <repeats>] [--tag <tag>] [--output <file>]"
     echo "Run the TPC-H queries a number of times and report timings."
     echo ""
+    echo "Options:"
     echo "  -d, --db <db>                     The database"
     echo "  -n, --number <repeats>            How many times to run the queries. Default=1"
     echo "  -t, --tag <tag>                   An arbitrary string to distinguish this"
