@@ -12,8 +12,14 @@ farm_path=
 # The TPC-H scale factor
 scale_factor=
 
+# The daemon port
+port=50000
+
+# Should we actually run?
+dry_run=
+
 usage() {
-    echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>]"
+    echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>] [--dry-run]"
     echo "Generate and load TPC-H data to MonetDB"
     echo ""
     echo "Options:"
@@ -23,9 +29,18 @@ usage() {
     echo "                                         data farm."
     echo "  -p, --port <port>                      The MonetDB daemon listen port"
     echo "                                         (default 50000)."
+    echo "  -d, --dry-run                          Do not generate or load data,"
+    echo "                                         just print the start up command."
 }
 
-port=50000
+server_startup_command() {
+    echo "Use the command"
+    echo ""
+    echo "  mserver5 --dbpath=$farm_path/SF-$scale_factor --set monet_vault_key=$farm_path/SF-$scale_factor/.vaultkey"
+    echo ""
+    echo "to start the server."
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -s|--sf)
@@ -43,6 +58,10 @@ while [ "$#" -gt 0 ]; do
             shift
             shift
             ;;
+	-d|--dry-run)
+	    dry_run="true"
+	    shift
+	    ;;
 	-h|--help)
 	    usage
 	    exit 0
@@ -64,6 +83,11 @@ fi
 if [ "$farm_path" = "${farm_path#/}" ]; then
     usage
     exit 1
+fi
+
+if [ ! -z "$dry_run" ]; then
+    server_startup_command
+    exit 0
 fi
 
 # Find the root directory of the TPC-H scripts
@@ -113,9 +137,8 @@ fi
 # Stop the daemon
 monetdbd stop "$farm_path"
 
-echo "SF-$scale_factor loaded. Use"
-echo "mserver5 --dbpath=$farm_path/SF-$scale_factor --set monet_vault_key=$farm_path/SF-$scale_factor/.vaultkey"
-echo "to start the server."
+echo "SF-$scale_factor loaded."
+server_startup_command
 
 # Go back to the original directory
 popd
