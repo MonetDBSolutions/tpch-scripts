@@ -40,6 +40,13 @@ time mclient -d "$1" -p "$port" -ei tpch_alter.sql
 date
 
 echo "Verifying: all the numbers should be zero"
-mclient -d "$1" -p "$port" -f csv $1.verify | tee /tmp/verify_load
+verify_file=/tmp/verify_load_new  # TODO: make this a tempfile
+mclient -d "$1" -p "$port" -f csv $1.verify | tee "$verify_file"
 
-cmp ground_truth /tmp/verify_load
+cmp ground_truth "$verify_file"
+if [ $? == 0 ]; then
+    rm "$verify_file"
+else
+    echo "Something went wrong. Review and then delete ${verify_file}"
+    exit 1
+fi
