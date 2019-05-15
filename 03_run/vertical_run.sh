@@ -96,7 +96,6 @@ do
         sec=$(python -c "print($x - $s)")
         ttl=$(python -c "print($ttl + $sec)")
     done
-    echo "Stats per run:"
     echo "$dbname,$tag, run #$r,$ttl" | tee -a "$output"
 done
 
