@@ -107,7 +107,10 @@ scripts that help with performing measurements.
 #### The `horizontal_run.sh` script
 
 The simplest measurement is done using the script
-`horizontal_run.sh`. You need to specify the following arguments:
+`horizontal_run.sh` (or the script `vertical_run.sh`, see below).
+It runs every TPC-H benchmark query repeatedly for N times (hence the name
+ `horizontal_run`).
+You need to specify the following arguments:
 
 * database that contains the data (`--db`)
 * number of repeats (`--number`)
@@ -144,6 +147,22 @@ reported as well.
 In this case the MonetDB server needs to be running before executing
 the script. The simplest way to start it is by using the command the
 `tpch_build.sh` reports when it finishes.
+
+#### The `vertical_run.sh` script
+
+The script `vertical_run.sh` is another way to do experiments.
+It repeatedly runs the whole set of TPC-H benchmark queries for N times (hence
+ the name `vertial_run`).
+
+This script supports exactly the same command line options as the script
+ `horizontal_run.sh` does.
+However, it outputs different information about query executions, which
+ contains the following columns:
+
+1. database
+1. tag
+1. run number
+1. total exec. time of this query set
 
 #### The `param_experiment.sh` script
 
