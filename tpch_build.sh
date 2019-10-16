@@ -53,7 +53,7 @@ while [ "$#" -gt 0 ]; do
             shift
             ;;
         -f|--farm)
-            farm_path=$2
+            farm_path=${2%/}
             shift
             shift
             ;;
