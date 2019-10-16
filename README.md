@@ -93,7 +93,7 @@ will do the following:
 
 1. generate the data for scale factor 100 (i.e. 100 GB of data)
 1. create a MonetDB database farm at the specified directory
-1. create a MonetDB database named `SF-100`
+1. create a MonetDB database named `SF-100` (NB for scale factors smaller than 1, the decimal separator '.' is replaced by '_' so as to produce a dbname accepted by MonetDB)
 1. load the data in the database
 1. print the command you need to run in order to start the MonetDB server
 

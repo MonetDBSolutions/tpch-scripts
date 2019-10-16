@@ -28,6 +28,7 @@ usage() {
     echo "Options:"
     echo "  -s, --sf <scale factor>                The scale factor for TPC-H data."
     echo "                                         Scale factor 1 is 1GB of data."
+    echo "                                         Scale factor 0.1 is 100MB of data."
     echo "  -f, --farm <farm path>                 The absolute path to the MonetDB"
     echo "                                         data farm."
     echo "  -p, --port <port>                      The MonetDB daemon listen port"
@@ -47,7 +48,12 @@ server_startup_command() {
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -s|--sf)
-	# For scale factor smaller than 1, replace the '.' with '_' for the dbname
+            if [ "$2" != "${2//[,]/}" ]; then
+                echo -e "ERROR: invalid scale factor \"$2\". Use '.' as decimal separator instead\n"
+                usage
+                exit 1
+            fi
+            # For scale factor smaller than 1, replace the '.' with '_' for the dbname
             scale_factor=${2//[.]/_}
             shift
             shift
