@@ -47,7 +47,8 @@ server_startup_command() {
 while [ "$#" -gt 0 ]; do
     case "$1" in
         -s|--sf)
-            scale_factor=$2
+	# For scale factor smaller than 1, replace the '.' with '_' for the dbname
+            scale_factor=${2//[.]/_}
             shift
             shift
             ;;
