@@ -106,7 +106,7 @@ def main(args):
                 wait -= 1
                 if wait == 0:
                     alert = 1
-                    write("=================> performance degradated!")
+                    write("=================> performance degradation detected!")
             else:
                 if devpercnt < threshold and alert == 1:
                     wait += 1
