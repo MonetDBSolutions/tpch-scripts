@@ -263,7 +263,9 @@ After each query execution, the script compares this execution time against the
  baseline performance of this query to see if the performance of this query has
  degradated.
 The performance deviation percentage is computed using
+
   devpercnt = (current_exec_time - baseline_exec_time) / baseline_exec_time.
+
 If `devpercnt` is larger than the threshold given by the option
  `--degradation_threshold`, then we have detected a "performance degradation".
 Otherwise, we have a "performance normality".
@@ -273,10 +275,13 @@ If the performance is in the `normality` state (i.e. its initial state) and the
  `--patience` (i.e. patience level), then the performance will be put in a
  `degradated` state.
 Therefore, the script will give a performance degradation warning
- "=================> performance degradation detected!".
+
+  "=================> performance degradation detected!".
+
 If the performance is in the `degradated` state, and the number of performance
  normalities has reached the patience level, then the script will announce that:
- "=================> performance returned to normality".
+
+  "=================> performance returned to normality".
 
 Next to the performance status, this script also outputs information about the
  query executions, which contains the following columns:
@@ -287,4 +292,14 @@ Next to the performance status, this script also outputs information about the
 1. exec. time of this query
 1. deviation of this exec. time from its base exec. time
 1. percentage of the deviation of compared to its base exec. time
+
+As an example, in the following command:
+
+  ./perf_monitor.py -i 10 -p 5 -d 30 -t 0.5 SF-1
+
+* `-i 10`: execute the queries 10 times (i.e. ) to obtain the baseline performance
+*  `-p 5`: collect 5 performance degradations before printing a warning
+* `-d 30`: run the performance monitoring for 30 seconds (excl. the initiation time)
+* `-t 0.5`: regard execution time increases of larger than 50% as performance degradations
+For more information about the options, see `./perf_monitor.py -h`.
 
