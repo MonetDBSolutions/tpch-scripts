@@ -89,6 +89,7 @@ def main(args):
     done = False
     deadline = time.time() + (args.duration or float("inf"))
     patience = args.patience or 0
+    degradation_threshold = args.degradation_threshold or 0.25
     wait = patience
     alert = 0
     while not done:
@@ -101,18 +102,17 @@ def main(args):
             devpercnt = dev/base_performance[q]
             devpercnt += random.randint(1,25)/100
             write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), qtime, dev, devpercnt)
-            if devpercnt > 0.25 and alert == 0:
+            if devpercnt > degradation_threshold and alert == 0:
                 wait -= 1
                 if wait == 0:
                     alert = 1
-                    print("=================> set performance alert!")
+                    write("=================> performance degradated!")
             else:
-                if devpercnt < 0.25 and alert == 1:
+                if devpercnt < degradation_threshold and alert == 1:
                     wait += 1
                     if wait == patience:
                         alert = 0
-                        print("=================> reset performance alert!")
-            print("=================> patience: ", wait)
+                        write("=================> performance returned to normality")
 
         # we always finish executing a full query set
         if time.time() >= deadline:
@@ -135,6 +135,8 @@ parser.add_argument('--silent', action='store_true',
                     help='Do not write the results to stdout')
 parser.add_argument('--patience', '-p', type=int,
                     help='Wait for how many degraded queries before giving performance alert, 0: immediately.')
+parser.add_argument('--degradation_threshold', '-t', type=float,
+                    help='How much slower (in percentage) compared to its baseline performance should we regard a query\'s performance to have degradated, default: 0.25.')
 
 if __name__ == "__main__":
     try:
