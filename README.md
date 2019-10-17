@@ -247,3 +247,44 @@ this server and start a new one with the argument
 
 The script `start_mserver.sh` is used internally by the script
 `param_experiment.sh` and should not need to be called directly.
+
+#### The `perf_monitor.py` script
+
+The script `perf_monitor.py` can be used to monitor the query performance over
+ a relatively long running period.
+First, it repleatedly executes each query in the benchmark 5 times and compute
+ the average of the 4 fastest executions.
+This average is regarded as the baseline performance of this query.
+Then, the script repeatedly execute the whole benchmark query set for the time
+ period as given by the option `--duration`.
+For each iteration, the queries are randomly ordered for their executions.
+
+After each query execution, the script compares this execution time against the
+ baseline performance of this query to see if the performance of this query has
+ degradated.
+The performance deviation percentage is computed using
+  devpercnt = (current_exec_time - baseline_exec_time) / baseline_exec_time.
+If `devpercnt` is larger than the threshold given by the option
+ `--degradation_threshold`, then we have detected a "performance degradation".
+Otherwise, we have a "performance normality".
+
+If the performance is in the `normality` state (i.e. its initial state) and the
+ number of performance degradations has reached the number given by the option
+ `--patience` (i.e. patience level), then the performance will be put in a
+ `degradated` state.
+Therefore, the script will give a performance degradation warning
+ "=================> performance degradation detected!".
+If the performance is in the `degradated` state, and the number of performance
+ normalities has reached the patience level, then the script will announce that:
+ "=================> performance returned to normality".
+
+Next to the performance status, this script also outputs information about the
+ query executions, which contains the following columns:
+
+1. db name
+1. run number
+1. query number
+1. exec. time of this query
+1. deviation of this exec. time from its base exec. time
+1. percentage of the deviation of compared to its base exec. time
+
