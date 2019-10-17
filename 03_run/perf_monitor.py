@@ -69,7 +69,9 @@ def main(args):
     if not queries:
         raise Issue("No queries found")
 
-    # TODO: execute the queries 5 times and compute average as their "normal" exec. times.
+    # First get the performance baseline: execute each query 5 times
+    #   consecutively, remove the slowest execution and compute the average of
+    #   the remaining executions as its baseline performance.
     seq = 0
     base_performance = {}
     for q in queries:
@@ -82,7 +84,7 @@ def main(args):
         name = "q"+os.path.splitext(os.path.basename(q))[0]
         write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), base_performance[q], 0,0)
 
-    # Now the monitoring part
+    # Now repeatedly run the queries randomly to monitor their performances
     rnd = random.Random(0)
     done = False
     deadline = time.time() + (args.duration or float("inf"))
