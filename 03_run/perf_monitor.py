@@ -74,9 +74,10 @@ def main(args):
     #   the remaining executions as its baseline performance.
     seq = 0
     base_performance = {}
+    niters = args.init_no or 5
     for q in queries:
         qtimes = []
-        for i in range(5):
+        for i in range(niters):
             qtimes.append(run(args.db, q))
         qtimes.remove(max(qtimes))
         base_performance[q] = sum(qtimes)/len(qtimes)
@@ -89,7 +90,7 @@ def main(args):
     done = False
     deadline = time.time() + (args.duration or float("inf"))
     patience = args.patience or 0
-    degradation_threshold = args.degradation_threshold or 0.25
+    threshold = args.threshold or 0.25
     wait = patience
     alert = 0
     while not done:
@@ -100,15 +101,14 @@ def main(args):
             name = "q"+os.path.splitext(os.path.basename(q))[0]
             dev = qtime-base_performance[q]
             devpercnt = dev/base_performance[q]
-            devpercnt += random.randint(1,25)/100
-            write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), qtime, dev, devpercnt)
-            if devpercnt > degradation_threshold and alert == 0:
+            write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), qtime, dev, devpercnt*100)
+            if devpercnt > threshold and alert == 0:
                 wait -= 1
                 if wait == 0:
                     alert = 1
                     write("=================> performance degradated!")
             else:
-                if devpercnt < degradation_threshold and alert == 1:
+                if devpercnt < threshold and alert == 1:
                     wait += 1
                     if wait == patience:
                         alert = 0
@@ -129,13 +129,15 @@ parser.add_argument('--name', '-n',
                     help='Config name, used to label the results, defaults to database name')
 parser.add_argument('--duration', '-d', type=int,
                     help='After this many seconds no new query set is started, 0 or omitted: to continue indefinitely.')
+parser.add_argument('--init_no', '-i', type=int,
+                    help='The number of iterations to run to initialise the query base performance, default: 5.')
 parser.add_argument('--output', '-o',
                     help='File or directory to write output to, defaults to ./<CONFIG>.csv')
 parser.add_argument('--silent', action='store_true',
                     help='Do not write the results to stdout')
 parser.add_argument('--patience', '-p', type=int,
                     help='Wait for how many degraded queries before giving performance alert, 0: immediately.')
-parser.add_argument('--degradation_threshold', '-t', type=float,
+parser.add_argument('--threshold', '-t', type=float,
                     help='How much slower (in percentage) compared to its baseline performance should we regard a query\'s performance to have degradated, default: 0.25.')
 
 if __name__ == "__main__":
