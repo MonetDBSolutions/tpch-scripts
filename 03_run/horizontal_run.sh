@@ -77,7 +77,7 @@ today=$(date +%Y-%m-%d)
 dir=results/"$today_$dbname_$tag"
 mkdir -p "$dir"
 
-# echo "# Database,Tag,Query,Min,Max,Average" >> "$output"
+echo "# Database,Tag,Query,Min,Max,Average" | tee -a "$output"
 for i in $(ls ??.sql)
 do
     echo "$optimizer" > "/tmp/$i"
