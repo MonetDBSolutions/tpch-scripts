@@ -12,3 +12,5 @@ sf*/
 results/
 *.counts
 *.verify
+Pipfile
+Pipfile.lock
