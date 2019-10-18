@@ -272,19 +272,13 @@ Otherwise, we have a "performance normality".
 
 If the performance is in the `normality` state (i.e. its initial state) and the
  number of performance degradations has reached the number given by the option
- `--patience` (i.e. patience level), then the performance will be put in a
- `degradated` state.
-Therefore, the script will give a performance degradation warning
-
-    "=================> performance degradation detected!".
-
+ `--patience` (i.e. patience level), then the performance will receive a
+ `degradated` status.
 If the performance is in the `degradated` state, and the number of performance
- normalities has reached the patience level, then the script will announce that:
+ normalities has reached the patience level, then the performance will receive
+ a `normality` status.
 
-    "=================> performance returned to normality".
-
-Next to the performance status, this script also outputs information about the
- query executions, which contains the following columns:
+This script outputs the following information about the query executions:
 
 1. db name
 1. run number
@@ -292,12 +286,24 @@ Next to the performance status, this script also outputs information about the
 1. exec. time of this query
 1. deviation of this exec. time from its base exec. time
 1. percentage of the deviation of compared to its base exec. time
+1. has the query performance degradated? 0: normality, 1: degradation
 
-As an example, in the following command:
+Example usage:
+
+To use this script, one basically need to conduct the following three steps.
+
+First, use the `tpch_build.sh` script in the root directory of this repository to generate and load a TPC-H dataset, e.g.:
+    ./tpch_build.sh -s 1 -f /<path>/<to>/tpch
+
+Second, start the just created database (this command can be copy-pasted from the final output of the `tpch_build.sh` script, or acquired later from this script using it `-d` option.  For more information, see the help message of this script.):
+    mserver5 --dbpath=/<path>/<to>/tpch/SF-1 --set monet_vault_key=/<path>/<to>/tpch/SF-1/.vaultkey
+
+Finally, start the performance monitoring:
 
     ./perf_monitor.py -i 10 -p 5 -d 30 -t 0.5 SF-1
 
-* `-i 10`: execute the queries 10 times (i.e. ) to obtain the baseline performance
+where the options mean:
+* `-i 10`: execute the queries 10 times to obtain the baseline performance
 *  `-p 5`: collect 5 performance degradations before printing a warning
 * `-d 30`: run the performance monitoring for 30 seconds (excl. the initiation time)
 * `-t 0.5`: regard execution time increases of larger than 50% as performance degradations

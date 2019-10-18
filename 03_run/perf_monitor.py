@@ -63,7 +63,7 @@ def main(args):
         print("Output file %s already exists", outfilename, file=sys.stderr)
         sys.exit(1)
     write = writer(outfilename, not args.silent)
-    write("config,seqno,query,exec time,deviation,devpercnt")
+    write("config,seqno,query,exec_time,perf_dev,dev_pcnt,perf_stts")
 
     queries = sorted(glob.glob('??.sql'))
     if not queries:
@@ -74,7 +74,7 @@ def main(args):
     #   the remaining executions as its baseline performance.
     seq = 0
     base_performance = {}
-    niters = args.init_no or 5
+    niters = args.init_no or 10
     for q in queries:
         qtimes = []
         for i in range(niters):
@@ -83,7 +83,7 @@ def main(args):
         base_performance[q] = sum(qtimes)/len(qtimes)
         # also write this normal time to the output file
         name = "q"+os.path.splitext(os.path.basename(q))[0]
-        write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), base_performance[q], 0,0)
+        write("%s,%d,%s,%.2f,%.2f,%.2f%%,%d", qq(config), seq, qq(name), base_performance[q], 0,0,0)
 
     # Now repeatedly run the queries randomly to monitor their performances
     rnd = random.Random(0)
@@ -101,18 +101,16 @@ def main(args):
             name = "q"+os.path.splitext(os.path.basename(q))[0]
             dev = qtime-base_performance[q]
             devpercnt = dev/base_performance[q]
-            write("%s,%d,%s,%.2f,%.2f,%.2f%%", qq(config), seq, qq(name), qtime, dev, devpercnt*100)
             if devpercnt > threshold and alert == 0:
                 wait -= 1
                 if wait == 0:
                     alert = 1
-                    write("=================> performance degradation detected!")
             else:
                 if devpercnt < threshold and alert == 1:
                     wait += 1
                     if wait == patience:
                         alert = 0
-                        write("=================> performance returned to normality")
+            write("%s,%d,%s,%.2f,%.2f,%.2f%%,%d", qq(config), seq, qq(name), qtime, dev, devpercnt*100, alert)
 
         # we always finish executing a full query set
         if time.time() >= deadline:
@@ -130,13 +128,13 @@ parser.add_argument('--name', '-n',
 parser.add_argument('--duration', '-d', type=int,
                     help='After this many seconds no new query set is started, 0 or omitted: to continue indefinitely.')
 parser.add_argument('--init_no', '-i', type=int,
-                    help='The number of iterations to run to initialise the query base performance, default: 5.')
+                    help='The number of iterations to run to initialise the query base performance, default: 10.')
 parser.add_argument('--output', '-o',
                     help='File or directory to write output to, defaults to ./<CONFIG>.csv')
 parser.add_argument('--silent', action='store_true',
                     help='Do not write the results to stdout')
 parser.add_argument('--patience', '-p', type=int,
-                    help='Wait for how many degraded queries before giving performance alert, 0: immediately.')
+                    help='Wait for how many degraded queries before changing the performance status, 0: immediately.')
 parser.add_argument('--threshold', '-t', type=float,
                     help='How much slower (in percentage) compared to its baseline performance should we regard a query\'s performance to have degradated, default: 0.25.')
 
