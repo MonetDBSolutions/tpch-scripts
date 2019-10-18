@@ -288,7 +288,7 @@ This script outputs the following information about the query executions:
 1. percentage of the deviation of compared to its base exec. time
 1. performance status: 0 - normality, 1 - degradation
 
-Example usage:
+**Example usage:**
 
 To use this script, one basically need to conduct the following three steps.
 
