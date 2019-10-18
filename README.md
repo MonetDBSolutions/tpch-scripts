@@ -312,6 +312,14 @@ where the options mean:
 *  `-p 5`: collect 5 performance degradations before printing a warning
 * `-d 30`: run the performance monitoring for 30 seconds (excl. the initiation time)
 * `-t 0.5`: regard execution time increases of larger than 50% as performance degradations
+* `SF-1`: name of the database
+
+Note that `perf_monitor.py` assumes that a MonetDB server (such as the one
+ started in the second step above) is serving the database `SF-1` using de
+ default host and port number (i.e. `localhost:50000`).
+Also, the script assumes that the path to the MonetDB binary files has been
+ properly added to `$PATH` (otherwise, you would not have been able to run the
+ `tpch_build.sh` script).
 
 For more information about the options, see `./perf_monitor.py -h`.
 
