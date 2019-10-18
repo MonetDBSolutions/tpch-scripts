@@ -252,31 +252,31 @@ The script `start_mserver.sh` is used internally by the script
 
 The script `perf_monitor.py` can be used to monitor the query performance over
  a relatively long running period.
-First, it repleatedly executes each query in the benchmark 5 times and compute
- the average of the 4 fastest executions.
+First, it executes each query in the benchmark `N` times and compute the
+ average time of `N-1` fastest executions.
 This average is regarded as the baseline performance of this query.
 Then, the script repeatedly execute the whole benchmark query set for the time
  period as given by the option `--duration`.
-For each iteration, the queries are randomly ordered for their executions.
+During each iteration, the queries are first randomly reordered for their
+ executions.
 
 After each query execution, the script compares this execution time against the
- baseline performance of this query to see if the performance of this query has
- degradated.
-The performance deviation percentage is computed using
+ baseline performance of this query to see if its performance has degradated.
+The performance deviation percentage is computed as:
 
     devpercnt = (current_exec_time - baseline_exec_time) / baseline_exec_time.
 
 If `devpercnt` is larger than the threshold given by the option
- `--degradation_threshold`, then we have detected a "performance degradation".
-Otherwise, we have a "performance normality".
+ `--degradation_threshold`, then we have detected a _performance degradation_.
+Otherwise, we have a _performance normality_.
 
-If the performance is in the `normality` state (i.e. its initial state) and the
- number of performance degradations has reached the number given by the option
- `--patience` (i.e. patience level), then the performance will receive a
- `degradated` status.
-If the performance is in the `degradated` state, and the number of performance
- normalities has reached the patience level, then the performance will receive
- a `normality` status.
+If the performance status is `normality`, which is also the initial status, and
+ the number of performance degradations has reached the number given by the
+ option `--patience` (i.e. the patience level), then the performance status
+ will be changed into `degradation`.
+If the performance status is `degradation` and the number of performance
+ normalities has reached the patience level, then the performance status will
+ be changed into `normality`.
 
 This script outputs the following information about the query executions:
 
@@ -286,16 +286,21 @@ This script outputs the following information about the query executions:
 1. exec. time of this query
 1. deviation of this exec. time from its base exec. time
 1. percentage of the deviation of compared to its base exec. time
-1. has the query performance degradated? 0: normality, 1: degradation
+1. performance status: 0 - normality, 1 - degradation
 
 Example usage:
 
 To use this script, one basically need to conduct the following three steps.
 
-First, use the `tpch_build.sh` script in the root directory of this repository to generate and load a TPC-H dataset, e.g.:
+First, use the `tpch_build.sh` script (in the root directory of this
+ repository) to generate a TPC-H dataset and load it into a MonetDB database:
+
     ./tpch_build.sh -s 1 -f /<path>/<to>/tpch
 
-Second, start the just created database (this command can be copy-pasted from the final output of the `tpch_build.sh` script, or acquired later from this script using it `-d` option.  For more information, see the help message of this script.):
+Second, start the just created database (this command can be copy-pasted from
+ the final output of the `tpch_build.sh` script, or acquired later from this
+ script using it `-d` option):
+
     mserver5 --dbpath=/<path>/<to>/tpch/SF-1 --set monet_vault_key=/<path>/<to>/tpch/SF-1/.vaultkey
 
 Finally, start the performance monitoring:
@@ -307,5 +312,6 @@ where the options mean:
 *  `-p 5`: collect 5 performance degradations before printing a warning
 * `-d 30`: run the performance monitoring for 30 seconds (excl. the initiation time)
 * `-t 0.5`: regard execution time increases of larger than 50% as performance degradations
+
 For more information about the options, see `./perf_monitor.py -h`.
 
