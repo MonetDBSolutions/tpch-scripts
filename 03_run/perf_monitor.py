@@ -47,7 +47,7 @@ def run(db, queryfile):
     if not m:
         max = 100
         snippet = err if len(err) <= max else "..." + err[-max:]
-        raise Issue("Query %s failed: %r" % (queryfile, snippet))
+        raise Issue("Query \"%s\" failed: %r" % (queryfile, snippet))
     return float(m.group(1))
 
 def main(args):
