@@ -38,7 +38,7 @@ def run(db, queryfile):
         p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (res, err) = p.communicate()
     except subprocess.CalledProcessError as e:
-        print("Query %s triggered an exception:" % queryfile, file=sys.stderr)
+        print("Query \"%s\" triggered an exception:" % queryfile, file=sys.stderr)
         raise e
     
     # Look for something like this: clk: 1297.253 ms
@@ -60,7 +60,7 @@ def main(args):
         else:
             outfilename = args.output
     if os.path.exists(outfilename):
-        print("Output file %s already exists", outfilename, file=sys.stderr)
+        print("Output file \"%s\" already exists" % outfilename, file=sys.stderr)
         sys.exit(1)
     write = writer(outfilename, not args.silent)
     write("config,seqno,query,exec_time,perf_dev,dev_pcnt,perf_stts")
