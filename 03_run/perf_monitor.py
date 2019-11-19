@@ -63,7 +63,7 @@ def main(args):
         print("Output file \"%s\" already exists" % outfilename, file=sys.stderr)
         sys.exit(1)
     write = writer(outfilename, not args.silent)
-    write("config,seqno,query,exec_time,perf_dev,dev_pcnt,perf_stts")
+    write("dbname,seqno,query,exec_time,perf_dev,dev_pcnt,perf_stts")
 
     queries = sorted(glob.glob('??.sql'))
     if not queries:

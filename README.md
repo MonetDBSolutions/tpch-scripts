@@ -252,7 +252,7 @@ The script `start_mserver.sh` is used internally by the script
 
 The script `perf_monitor.py` can be used to monitor the query performance over
  a relatively long running period.
-First, it executes each query in the benchmark `N` times and compute the
+First, it executes each query in the benchmark `N` times and computes the
  average time of `N-1` fastest executions.
 This average is regarded as the baseline performance of this query.
 Then, the script repeatedly execute the whole benchmark query set for the time
@@ -261,7 +261,7 @@ During each iteration, the queries are first randomly reordered for their
  executions.
 
 After each query execution, the script compares this execution time against the
- baseline performance of this query to see if its performance has degradated.
+ baseline performance of this query to see if its performance has decreased.
 The performance deviation percentage is computed as:
 
     devpercnt = (current_exec_time - baseline_exec_time) / baseline_exec_time.
@@ -290,7 +290,7 @@ This script outputs the following information about the query executions:
 
 **Example usage:**
 
-To use this script, one basically need to conduct the following three steps.
+To use this script, one basically needs to conduct the following three steps.
 
 First, use the `tpch_build.sh` script (in the root directory of this
  repository) to generate a TPC-H dataset and load it into a MonetDB database:
