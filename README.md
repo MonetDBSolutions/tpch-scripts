@@ -72,6 +72,7 @@ structure of this repository is shown below:
     │       └── 30000
     ├── 02_load
     └── 03_run
+    └── 04_run
 
 Directory `01_build` contains the data generator that TPC provides for
 this benchmark, directory `02_load` contains scripts that automate the
@@ -322,4 +323,13 @@ Also, the script assumes that the path to the MonetDB binary files has been
  `tpch_build.sh` script).
 
 For more information about the options, see `./perf_monitor.py -h`.
+`start_mserver.sh` script
 
+#### The 04-run scripts
+For quality assessment of the code base we should regularly run the benchmark and keep track of
+its deviances against the past. The vertical-sh script is derived from the 03-run version, but
+it also can be marked with the SQL modifiers {plan, explain, trace} and optimizer pipe.
+Their result is collected in corresponding sub directories. For a traced experiment we 
+calculate a summary of where the time is spent. For the ordinary result we immediately
+create the diffs with the previous run.
+The last experiment can be accessed using {trace,plan,explain,results}/last.
