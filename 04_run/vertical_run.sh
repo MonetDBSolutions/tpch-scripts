@@ -15,6 +15,7 @@ usage() {
     echo "  -n, --number <repeats>            How many times to run the queries. Default=1"
     echo "                                    run from others in the same results CSV. Default=timings"
     echo "  -m, --modifier <tag>              The SQL statement modifier {results,plan,trace,explain}"
+    echo "  -t, --today <tag>                 The SQL statement modifier {results,plan,trace,explain}"
     echo "  -p, --pipeline <pipeline>         The SQL query optimizer pipeline"
     echo "  -o, --output <directory>          The path to the output directory. Default=`pwd`/$modifier/$day_$dbname/timings.csv"
     echo "  -v, --verbose                     More output"
@@ -30,6 +31,7 @@ modifier=
 pipeline=default_pipe
 output=`pwd`
 
+echo "$*"
 
 while [ "$#" -gt 0 ]
 do
@@ -45,7 +47,7 @@ do
             shift
             ;;
         -t|--tag)
-            tag=$2
+            today=$2
             shift
             shift
             ;;
@@ -112,7 +114,7 @@ do
     for q in $(ls ??.sql)
     do
         if [ $r == 1 ]; then
-            echo "${optimizer} ${modifier}" > "/tmp/$q"
+		echo "${optimizer} ${modifier}" > "/tmp/$q"
             cat "$q" >> "/tmp/$q"
         fi
 
@@ -136,14 +138,16 @@ then
     for i in `cat * | grep ' := ' | egrep -v ' := (user\.s[0-9]|language\.dataflow)' | sed 's|^.* := \([^(]*\)(.*$|\1|' | sort -u`
     do
         c=`cat * | grep " := $i("|wc| sed -e "s/^ *//" -e "s/ .*//"`
-        printf "%s   %8s calls %s\n" "`cat * | grep " := $i(" | awk 'BEGIN {s=0} {s+=$2} END {printf "%15d us   %9.6f %%\n",s,s/'"$x"'.0*100,$c}'`" $c,  $i ;
+        s=`cat * | grep " := $i(" | awk 'BEGIN {s=0} {s+=$2} END {printf "%15d us   %9.6f %%\n",s,s/'"$x"'.0*100,$c}'`
+        printf "%s   %8s  %8s calls %s\n" $s, $c, $s/$c,  $i ;
+        #printf "%s   %8s calls %s\n" "`cat * | grep " := $i(" | awk 'BEGIN {s=0} {s+=$2} END {printf "%15d us   %9.6f %%\n",s,s/'"$x"'.0*100,$c}'`" $c,  $i ;
     done | sort -nr > summary
 fi
 
 # perform a comparison of the results with the previous one
 
-prev=`ls -t ${bucket}/ | head -2 |tail -1`
-last=`ls -t ${bucket}/ | head -1`
+prev=`ls -t ${bucket}/*${dbname} | head -2 |tail -1`
+last=`ls -t ${bucket}/*${dbname} | head -1`
 rm ${bucket}/last
 ln -s ${last} ${bucket}/last
 
