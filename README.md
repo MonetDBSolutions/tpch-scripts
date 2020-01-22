@@ -131,6 +131,10 @@ You need to specify the following arguments:
 * output file (`--output`)
 
   The file name for the output csv file.
+  
+* port (`--port`)
+  
+  The port on which the MonetDB server (or daemon) is listening.
 
 The file contains the following columns:
 
