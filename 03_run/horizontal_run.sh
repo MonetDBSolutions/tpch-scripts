@@ -16,12 +16,14 @@ usage() {
     echo "  -t, --tag <tag>                   An arbitrary string to distinguish this"
     echo "                                    run from others in the same results CSV."
     echo "  -o, --output <file>               Where to append the output. Default=timings.csv"
+    echo "  -p, --port <port>                 Port number where the server is listening"
     echo "  -v, --verbose                     More output"
     echo "  -h, --help                        This message"
 }
 
 dbname=
 nruns=1
+port=50000
 tag="default"
 output="timings.csv"
 
@@ -45,6 +47,11 @@ do
             ;;
         -o|--output)
             output=$2
+            shift
+            shift
+            ;;
+        -p|--port)
+            port=$2
             shift
             shift
             ;;
@@ -89,7 +96,7 @@ do
     for j in $(seq 1 $nruns)
     do
         s=$(date +%s.%N)
-        mclient -d "$dbname" -f raw -w 80 -i < "/tmp/$i" 2>&1 >/dev/null
+        mclient -d "$dbname" -p "$port" -f raw -w 80 -i < "/tmp/$i" 2>&1 >/dev/null
         x=$(date +%s.%N)
         sec=$(python -c "print($x - $s)")
         avg=$(python -c "print($avg + $sec)")
