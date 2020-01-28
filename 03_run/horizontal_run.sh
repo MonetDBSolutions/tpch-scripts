@@ -17,6 +17,7 @@ usage() {
     echo "                                    run from others in the same results CSV."
     echo "  -o, --output <file>               Where to append the output. Default=timings.csv"
     echo "  -p, --port <port>                 Port number where the server is listening"
+    echo "  -m, --optimizer <optimizer>       The optimizer pipeline to use"
     echo "  -v, --verbose                     More output"
     echo "  -h, --help                        This message"
 }
@@ -26,6 +27,7 @@ nruns=1
 port=50000
 tag="default"
 output="timings.csv"
+pipeline="default_pipe"
 
 while [ "$#" -gt 0 ]
 do
@@ -55,6 +57,11 @@ do
             shift
             shift
             ;;
+        -m|--optimizer)
+            pipeline=$2
+            shift
+            shift
+            ;;
         -v|--verbose)
             set -x
             set -v
@@ -77,7 +84,7 @@ if [ -z "$dbname" ]; then
     exit 1
 fi
 
-optimizer="set optimizer='default_pipe';"
+optimizer="set optimizer='$pipeline';"
 TIMEFORMAT="%R"
 
 today=$(date +%Y-%m-%d)
