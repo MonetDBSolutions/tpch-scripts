@@ -150,6 +150,8 @@ monetdbd start "$farm_path"
 ./sf_build.sh SF-"$scale_factor" "$port"
 if [ $? != 0 ]; then
     echo "Data not loaded correctly"
+    # Stop the daemon
+    monetdbd stop "$farm_path"
     exit 1
 fi
 # Stop the daemon
