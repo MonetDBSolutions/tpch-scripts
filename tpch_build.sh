@@ -18,11 +18,14 @@ port=50000
 # Should we actually run?
 dry_run=
 
+# Should we load the data?
+generate_only=
+
 # show commands as they are executed
 verbose=
 
 usage() {
-    echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>] [--dry-run]"
+    echo "Usage: $0 --sf <scale factor> --farm <farm path> [--port <port>] [--dry-run] [--generate-only]"
     echo "Generate and load TPC-H data to MonetDB"
     echo ""
     echo "Options:"
@@ -35,6 +38,8 @@ usage() {
     echo "                                         (default 50000)."
     echo "  -d, --dry-run                          Do not generate or load data,"
     echo "                                         just print the start up command."
+    echo "  -g, --generate-only                    Only generate the data."
+    echo "                                         Don't load it."
 }
 
 server_startup_command() {
@@ -72,6 +77,10 @@ while [ "$#" -gt 0 ]; do
 	    dry_run="true"
 	    shift
 	    ;;
+	-g|--generate-only)
+	    generate_only="true"
+	    shift
+	    ;;
 	-v|--verbose)
 	    verbose="true"
 	    shift
@@ -88,13 +97,16 @@ while [ "$#" -gt 0 ]; do
     esac
 done
 
-if [ -z "$scale_factor" -o -z "$farm_path" ]; then
+if [ -z "$scale_factor" ]; then
+    usage
+    exit 1
+elif [ -z "$generate_only" -a -z "$farm_path" ]; then
     usage
     exit 1
 fi
 
 # Make sure the farm path given is absolute
-if [ "$farm_path" = "${farm_path#/}" ]; then
+if [ -z "$generate_only" -a "$farm_path" = "${farm_path#/}" ]; then
     usage
     exit 1
 fi
@@ -109,7 +121,12 @@ if [ ! -z "$verbose" ]; then
 fi
 
 # Find the root directory of the TPC-H scripts
-root_directory=$(readlink -f $0)
+if [ `uname` == "Darwin" ]
+then
+	root_directory=`python3 -c 'import os,sys;print(os.path.realpath(sys.argv[1]))' $0`
+else
+	root_directory=$(readlink -f $0)
+fi
 root_directory=${root_directory%${0:1}}
 echo "Root directory = $root_directory"
 
@@ -137,6 +154,12 @@ if [ ! -e "$root_directory/02_load/SF-$scale_factor/data" ]; then
 fi
 
 pushd 02_load
+
+# We can stop now if we only want to generate the data
+if [ ! -z "$generate_only" ]; then
+    echo "Data set generated in $root_directory/02_load/SF-$scale_factor/data"
+    exit 0
+fi
 
 # Create the database farm
 if [ ! -e "$farm_path" ]; then
