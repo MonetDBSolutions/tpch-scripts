@@ -97,9 +97,11 @@ do
             cat "$q" >> "/tmp/$q"
         fi
 
-        s=$(date +%s.%N)
+        #s=$(date +%s.%N)
+		s=$(python3 -c 'import time; print(repr(time.time()))')
         mclient -d "$dbname" -p "$port" -f raw -w 80 -i < "/tmp/$q" 2>&1 >/dev/null
-        x=$(date +%s.%N)
+        #x=$(date +%s.%N)
+		x=$(python3 -c 'import time; print(repr(time.time()))')
         sec=$(python -c "print($x - $s)")
         ttl=$(python -c "print($ttl + $sec)")
     done
