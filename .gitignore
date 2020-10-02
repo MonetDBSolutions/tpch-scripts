@@ -14,3 +14,4 @@ results/
 *.verify
 Pipfile
 Pipfile.lock
+timings.csv
