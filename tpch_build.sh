@@ -10,6 +10,7 @@
 farm_path=
 
 # The TPC-H scale factor
+sf=
 scale_factor=
 
 # The daemon port
@@ -58,6 +59,8 @@ while [ "$#" -gt 0 ]; do
                 usage
                 exit 1
             fi
+            # keep the orginal value
+            sf=$2
             # For scale factor smaller than 1, replace the '.' with '_' for the dbname
             scale_factor=${2//[.]/_}
             shift
@@ -146,7 +149,7 @@ if [ ! -e "$root_directory/02_load/SF-$scale_factor/data" ]; then
     pushd 01_build/dbgen
     make
     # Create the data for the scale factor
-    ./dbgen -vf -s "$scale_factor"
+    ./dbgen -vf -s "$sf"
 
     mkdir -p "$root_directory/02_load/SF-$scale_factor/data"
     mv *.tbl "$root_directory/02_load/SF-$scale_factor/data"
