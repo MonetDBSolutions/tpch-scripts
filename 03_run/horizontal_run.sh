@@ -98,8 +98,9 @@ do
     cat "$i" >> "/tmp/$i"
 
     # iostat -t -m > /tmp/iostat
-    avg=0
+    # avg=0
 
+    out_data=""
     for j in $(seq 1 $nruns)
     do
         #s=$(date +%s.%N)
@@ -108,20 +109,10 @@ do
         #x=$(date +%s.%N)
 		x=$(python3 -c 'import time; print(repr(time.time()))')
         sec=$(python -c "print($x - $s)")
-        avg=$(python -c "print($avg + $sec)")
-        if [ $j == 1 ]; then
-            mn=$sec
-            mx=$sec
-        else
-            mn=$(python -c "print(min($mn, $sec))")
-            mx=$(python -c "print(max($mx, $sec))")
-        fi
+        out_data+=",$sec"
     done
-    avg=$(python -c "print($avg/$nruns)")
-    # iostat -t -m >> /tmp/iostat
-    # io=$(awk -f sumio.awk /tmp/iostat)
 
-    echo "$dbname,$tag,"$(basename $i .sql)",$mn,$mx,$avg" | tee -a "$output"
+    echo "$dbname,$tag,"$(basename $i .sql)"$out_data" | tee -a "$output"
 done
 
 
