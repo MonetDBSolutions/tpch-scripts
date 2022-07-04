@@ -26,6 +26,7 @@ dbname=
 nruns=1
 port=50000
 tag="default"
+
 pipeline="default_pipe"
 
 while [ "$#" -gt 0 ]
@@ -83,59 +84,46 @@ if [ -z "$dbname" ]; then
     exit 1
 fi
 
-output="$dbname.timings.csv"
+
+output="$tag.$dbname.timings.csv"
 optimizer="set optimizer='$pipeline';"
 TIMEFORMAT="%R"
 
-#today=$(date +%Y-%m-%d)
-#dir=results/"$today_$dbname_$tag"
-#mkdir -p "$dir"
+today=$(date +%Y-%m-%d)
+dir=results/"$today_$dbname_$tag"
+mkdir -p "$dir"
 
-#echo "### Free memory before the run :###" | tee -a "$output"
-#echo "$(free -h)" | tee -a "$output"
 
-echo "# Database,Tag,Query,Min,Max,Average" | tee -a "$output"
+
 for i in $(ls ??.sql)
 do
     echo "$optimizer" > "/tmp/$i"
     cat "$i" >> "/tmp/$i"
 
-    # iostat -t -m > /tmp/iostat
-    # avg=0
-
-
-    max=0
-    min=9999999
-    sum=0
-    
-    for j in $(seq 1 $nruns)
-    do
-        s=$(date +%s.%N)
-        mclient -d "$dbname" -p "$port" -f raw -w 80 -i < "/tmp/$i" 2>&1 >/dev/null
-        x=$(date +%s.%N)
-	elapsed=$(echo "scale=4; $x - $s" | bc)
-	
-	if [ $(echo "$elapsed > $max" | bc) -eq 1 ] 
-	then
-	    max=$elapsed
-	fi
-
-	if [ $(echo "$elapsed < $min" | bc) -eq 1 ]
-        then
-            min=$elapsed
-        fi
-
-	sum=$(echo "$elapsed + $sum" | bc)	
-	
-	#echo "$(free -h)" | tee -a "$output"
-	#mclient -d "$dbname" -p "$port" -s "select * from sys.bbp () as deb_data;" | tee -a "$output"
-
-    done
-
-    avg=$(echo "scale=4; $sum/$nruns" | bc)
-
-    echo "$dbname,$tag,"$(basename $i .sql)",$min,$max,$avg" | tee -a "$output"
+    echo "Warm-up: Running query $i"
+    mclient -d "$dbname" -p "$port" -f raw -w 80 -i < "/tmp/$i" 2>&1 >/dev/null	
 
 done
 
+ix=0
+echo "# Database,Id,Query,Runtime" | tee -a "$output"
+while [ $SECONDS -le 86400 ]
+do
+	q=$(( $RANDOM % 22 + 1 ))
 
+	if [[ $q -lt 10 ]] ; then
+		q=0$q
+	fi
+	
+	echo "Running random query $ix (${q}.sql) "
+	
+	s=$(python3 -c 'import time; print(repr(time.time()))')
+        mclient -d "$dbname" -p "$port" -f raw -w 80 -i < "/tmp/${q}.sql" 2>&1 >/dev/null
+	x=$(python3 -c 'import time; print(repr(time.time()))')
+
+        sec=$(python -c "print($x - $s)")
+
+
+        echo "$dbname,$ix,$q,$sec" | tee -a "$output"
+	ix=$(( $ix + 1 ))
+done
