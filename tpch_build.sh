@@ -130,7 +130,7 @@ then
 else
 	root_directory=$(readlink -f $0)
 fi
-root_directory=${root_directory%${0:1}}
+root_directory=${root_directory%/*}
 echo "Root directory = $root_directory"
 
 # Go to the scripts root directory
