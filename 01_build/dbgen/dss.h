@@ -172,13 +172,15 @@ typedef struct
 #define DIST_MEMBER(d, i)	((set_member *)((d)->list + i))->text
 #define DIST_PERMUTE(d, i)	(d->permute[i])
 
+typedef int (*loaderfunc)(void*, int);
+
 typedef struct
 {
    char     *name;
    char     *comment;
    DSS_HUGE      base;
-   int       (*loader) ();
-   long      (*gen_seed)();
+   loaderfunc loader;
+   long      (*gen_seed)(int, DSS_HUGE);
    int       child;
    DSS_HUGE vtotal;
 }         tdef;
